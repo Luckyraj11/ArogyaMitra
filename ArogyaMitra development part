@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArogyaMitra - Smart Public Health Assistant for Rural India</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-bg {
+            background-color: #f8fafc;
+        }
+        .btn-primary {
+            background-color: #0f766e;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0d6660;
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: #0f766e;
+            border: 1px solid #0f766e;
+        }
+        .btn-secondary:hover {
+            background-color: #0f766e;
+            color: white;
+        }
+        /* Custom styles for the floating chat button and window */
+        .chat-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+        }
+
+        .chat-button {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .chat-button:hover {
+            transform: scale(1.05);
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            width: 380px;
+            max-height: 80vh;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .chat-window.open {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #f1f5f9;
+        }
+
+        @media (max-width: 640px) {
+            .chat-window {
+                bottom: 24px;
+                right: 0;
+                width: 100%;
+                max-width: 100%;
+                height: 90%;
+                border-radius: 0;
+            }
+            .chat-button {
+                bottom: 24px;
+                right: 24px;
+            }
+        }
+        
+        /* Styles for the accordion */
+        .accordion-item {
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .accordion-header {
+            cursor: pointer;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            transition: background-color 0.2s;
+        }
+        .accordion-header:hover {
+            background-color: #f8fafc;
+        }
+        .accordion-content {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            background-color: #f8fafc;
+        }
+        .accordion-content.open {
+            max-height: 500px; /* Adjust this value if needed to fit content */
+            padding-top: 1.5rem;
+        }
+        .accordion-icon {
+            transition: transform 0.3s ease-out;
+        }
+        .accordion-header.open .accordion-icon {
+            transform: rotate(45deg);
+        }
+        .video-thumbnail {
+            position: relative;
+            cursor: pointer;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            transition: transform 0.3s ease-in-out;
+        }
+        .video-thumbnail:hover img {
+            transform: scale(1.05);
+        }
+
+        .video-thumbnail .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            opacity: 0.8;
+            transition: opacity 0.3s ease-in-out;
+            font-size: 3rem;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .video-thumbnail:hover .play-icon {
+            opacity: 1;
+        }
+        .video-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+        }
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .video-card .relative {
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .video-card .relative iframe, .video-card .relative img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Typing effect styles */
+        .typing-effect {
+            font-size: 1.125rem;
+            color: #4a5568;
+            height: 1.5rem; /* Prevents layout shift */
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: #0f766e;
+            vertical-align: middle;
+            margin-left: 2px;
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Hero Heading Animation */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .animate-hero {
+            animation: fadeInScale 1s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+
+        .share-button {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .share-button:hover {
+            background-color: #f1f5f9;
+        }
+        .share-button.copied {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .modal.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 90%;
+            width: 800px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: scale(0.95);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .modal.open .modal-content {
+            transform: scale(1);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #fff;
+            text-decoration: none;
+        }
+        
+        /* Chatbot specific styles */
+        .user-message {
+            background-color: #0f766e;
+            color: white;
+        }
+        .bot-message {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+        .message-bubble {
+            max-width: 80%;
+            padding: 1rem;
+            border-radius: 1.5rem;
+            margin-bottom: 1rem;
+            word-wrap: break-word;
+        }
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #9ca3af;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 0.8s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+        /* New animation for bot messages sliding in from the left */
+        .message-animate-bot {
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+        /* New animation for user messages sliding in from the right */
+        .message-animate-user {
+            opacity: 0;
+            transform: translateX(10px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+        /* Visible state for the new animations */
+        .message-animate-bot.visible,
+        .message-animate-user.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .quick-replies-transition {
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        /* Page navigation */
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+    <!-- Navigation between pages -->
+    <div id="home-page" class="page active">
+        <!-- Responsive Header -->
+        <header class="fixed top-0 z-50 w-full bg-white shadow-sm">
+            <nav class="max-w-7xl mx-auto px-6">
+                <div class="h-16 flex items-center justify-between">
+                    <!-- Brand with image logo -->
+                    <a href="#" class="flex items-center" onclick="showPage('home-page')">
+                        <img src="https://i.ibb.co/Kp9vTRvw/aarogyamitra.png" alt="ArogyaMitra Logo" class="h-10 w-40 object-contain" />
+                    </a>
+
+                    <!-- Desktop links -->
+                    <div class="hidden md:flex items-center space-x-2">
+                        <a href="#" onclick="showPage('home-page')" class="px-3 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-gray-100 transition-colors duration-200">Home</a>
+                        <a href="#features" class="px-3 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-gray-100 transition-colors duration-200">Features</a>
+                        <a href="#videos" class="px-3 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-gray-100 transition-colors duration-200">Videos</a>
+                        <a href="#faq" class="px-3 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-gray-100 transition-colors duration-200">FAQ</a>
+                        <a href="#contact" class="px-3 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-gray-100 transition-colors duration-200">Contact</a>
+                        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+                        <a href="#" onclick="showPage('login-page')" class="px-4 py-2 rounded-lg bg-transparent text-teal-600 border border-teal-600 hover:bg-teal-600 hover:text-white transition-colors duration-200">Login</a>
+                        <a href="#" onclick="showPage('signup-page')" class="px-4 py-2 rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors duration-200">Sign up</a>
+                    </div>
+
+                    <!-- Mobile menu button -->
+                    <button class="md:hidden inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:bg-gray-100" id="mobile-menu-button" aria-label="Toggle menu">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path id="mobile-menu-icon" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Mobile links -->
+                <div id="mobile-links" class="hidden md:hidden pb-3 space-y-1">
+                    <a href="#" onclick="showPage('home-page')" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Home</a>
+                    <a href="#features" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Features</a>
+                    <a href="#videos" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Videos</a>
+                    <a href="#faq" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">FAQ</a>
+                    <a href="#contact" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Contact</a>
+                    <div class="flex gap-2 px-3 pt-2">
+                        <a href="#" onclick="showPage('login-page')" class="flex-1 text-center px-3 py-2 rounded-lg bg-white text-teal-600 border border-teal-600 hover:bg-gray-100">Login</a>
+                        <a href="#" onclick="showPage('signup-page')" class="flex-1 text-center px-3 py-2 rounded-lg bg-teal-600 text-white hover:bg-teal-700">Sign up</a>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Content sections with IDs for navigation -->
+        <!-- Hero Section with mobile-friendly buttons -->
+        <section id="home" class="hero-bg py-20 mt-16">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-teal-800 mb-4 animate-hero">
+                    Smart Public Health Assistant for Rural India
+                </h1>
+                <p class="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto typing-effect-container">
+                    <span id="typing-text"></span>
+                    <span class="cursor"></span>
+                </p>
+                <!-- Updated button group for mobile friendliness -->
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                    <a href="https://wa.me/911234567890?text=Hello%20ArogyaMitra,%20I%20have%20a%20health-related%20query." class="btn-primary py-3 px-6 rounded-lg font-medium transition flex items-center justify-center space-x-2 w-full md:w-auto">
+                        <i class="fab fa-whatsapp text-lg"></i>
+                        <span>Chat on WhatsApp</span>
+                    </a>
+                    <a href="sms:+911234567890?body=HEALTH" class="btn-secondary py-3 px-6 rounded-lg font-medium transition flex items-center justify-center space-x-2 w-full md:w-auto">
+                        <i class="fas fa-message text-lg"></i>
+                        <span>SMS 'HEALTH' to +91 12345 67890</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-16 text-teal-800">Key Features of ArogyaMitra</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-file-medical text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Real-Time Disease Alerts</h3>
+                        <p class="text-gray-600">
+                            Receive instant alerts about local disease outbreaks and learn essential preventive measures.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-syringe text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Personalized Vaccination Reminders</h3>
+                        <p class="text-gray-600">
+                            Get timely reminders for you and your family's vaccination schedules directly via chat.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-database text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Government Health Database Integration</h3>
+                        <p class="text-gray-600">
+                            Our information is sourced directly from verified government health databases for 80% accuracy.
+                        </p>
+                    </div>
+                    
+                    <!-- New Features Added Below -->
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-stethoscope text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">AI-Powered Symptom Checker</h3>
+                        <p class="text-gray-600">
+                            Get a preliminary assessment of your symptoms with our advanced AI. It helps you understand potential conditions and next steps, but always consult a doctor for a diagnosis.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-chart-line text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Personalized Health Insights</h3>
+                        <p class="text-gray-600">
+                            Receive tailored advice on nutrition, fitness, and wellness based on your profile. ArogyaMitra learns from your interactions to provide a truly personalized experience.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-utensils text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Diet and Nutrition Tracker</h3>
+                        <p class="text-gray-600">
+                            Log your meals and get nutritional analysis. ArogyaMitra helps you make healthier food choices and maintain a balanced diet for overall well-being.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-running text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Fitness and Workout Plans</h3>
+                        <p class="text-gray-600">
+                            Create custom workout routines or choose from our pre-designed plans. Track your progress and get tips to stay motivated on your fitness journey.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-heart text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Mental Health & Wellness</h3>
+                        <p class="text-gray-600">
+                            Access guided meditations, stress-relief techniques, and resources for mental well-being. ArogyaMitra is here to support both your physical and mental health.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-teal-800">How ArogyaMitra Works</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-sms text-2xl text-teal-600 mr-3"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Simple Access via SMS & WhatsApp</h3>
+                        <p class="text-gray-600 mb-4">
+                            Just send a message to our dedicated number to start a conversation about your health queries. No app downloads required.
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-globe text-2xl text-green-600 mr-3"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Multilingual Support</h3>
+                        <p class="text-gray-600 mb-4">
+                            Communicate in your preferred language, including Hindi, English, and other regional languages.
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-heartbeat text-2xl text-pink-600 mr-3"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Instant Health Answers</h3>
+                        <p class="text-gray-600 mb-4">
+                            Get immediate, accurate, and easy-to-understand information on disease symptoms and preventive care.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Awareness Section -->
+        <section id="videos" class="py-20 bg-gray-100">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-teal-800">Video Health Awareness</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Video Card 1 -->
+                    <div class="video-card">
+                        <div class="relative video-container cursor-pointer" data-video-id="3zElj70dYJ4">
+                            <img src="https://img.youtube.com/vi/3zElj70dYJ4/hqdefault.jpg" alt="Health Awareness Video 1" class="w-full h-auto object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                <i class="fas fa-play-circle text-white text-5xl play-icon"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-lg text-teal-800 mb-1">Understanding the Signs of Diabetes</h3>
+                            <p class="text-sm text-gray-600 mb-4">A short video on the basics of diabetes and its symptoms.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Card 2 -->
+                    <div class="video-card">
+                        <div class="relative video-container cursor-pointer" data-video-id="eYP920Uiiqw">
+                            <img src="https://img.youtube.com/vi/eYP920Uiiqw/hqdefault.jpg" alt="Health Awareness Video 2" class="w-full h-auto object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                <i class="fas fa-play-circle text-white text-5xl play-icon"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-lg text-teal-800 mb-1">The Importance of Proper Handwashing</h3>
+                            <p class="text-sm text-gray-600 mb-4">Handwashing is crucial for preventing the spread of diseases.</p>
+                        </div>
+                    </div>
+
+                    <!-- Video Card 3 -->
+                    <div class="video-card">
+                        <div class="relative video-container cursor-pointer" data-video-id="lEZbSaikBTw">
+                            <img src="https://img.youtube.com/vi/lEZbSaikBTw/hqdefault.jpg" alt="Health Awareness Video 3" class="w-full h-auto object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                <i class="fas fa-play-circle text-white text-5xl play-icon"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-lg text-teal-800 mb-1">How to Protect Your Family from Dengue Fever</h3>
+                            <p class="text-sm text-gray-600 mb-4">Essential tips to prevent mosquito-borne illnesses.</p>
+                        </div>
+                    </div>
+
+                    <!-- Video Card 4 -->
+                    <div class="video-card">
+                        <div class="relative video-container cursor-pointer" data-video-id="W4HDj2CcPAM">
+                            <img src="https://img.youtube.com/vi/W4HDj2CcPAM/hqdefault.jpg" alt="Health Awareness Video 4" class="w-full h-auto object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                <i class="fas fa-play-circle text-white text-5xl play-icon"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-lg text-teal-800 mb-1">A Guide to Mental Health First Aid</h3>
+                            <p class="text-sm text-gray-600 mb-4">Learn how to support someone with a mental health concern.</p>
+                        </div>
+                    </div>
+
+                    <!-- Video Card 5 -->
+                    <div class="video-card">
+                        <div class="relative video-container cursor-pointer" data-video-id="QF3eOPim5Hk">
+                            <img src="https://img.youtube.com/vi/QF3eOPim5Hk/hqdefault.jpg" alt="Health Awareness Video 5" class="w-full h-auto object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                <i class="fas fa-play-circle text-white text-5xl play-icon"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-lg text-teal-800 mb-1">Nutrition for a Healthy Lifestyle</h3>
+                            <p class="text-sm text-gray-600 mb-4">Simple tips for a balanced and nutritious diet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- FAQ Section -->
+        <section id="faq" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-teal-800">Frequently Asked Questions</h2>
+                <div class="max-w-4xl mx-auto space-y-4">
+                    <div class="bg-white p-6 rounded-lg shadow-sm accordion-item">
+                        <div class="flex justify-between items-center cursor-pointer accordion-header">
+                            <h3 class="font-bold text-lg text-teal-800">Who is ArogyaMitra for?</h3>
+                            <i class="fas fa-plus text-xl text-teal-600 accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="text-gray-600">
+                                ArogyaMitra is specifically designed to provide essential health information to individuals in rural and semi-urban communities across India.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm accordion-item">
+                        <div class="flex justify-between items-center cursor-pointer accordion-header">
+                            <h3 class="font-bold text-lg text-teal-800">How does ArogyaMitra get its information?</h3>
+                            <i class="fas fa-plus text-xl text-teal-600 accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="text-gray-600">
+                                The chatbot is integrated with official government health databases to ensure all information about diseases, vaccinations, and alerts is accurate and reliable.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm accordion-item">
+                        <div class="flex justify-between items-center cursor-pointer accordion-header">
+                            <h3 class="font-bold text-lg text-teal-800">What languages does the chatbot support?</h3>
+                            <i class="fas fa-plus text-xl text-teal-600 accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="text-gray-600">
+                                The chatbot is multilingual and currently supports Hindi, English, Bengali, Marathi, Tamil, Telugu, Malayalam, Hinglish, and Odia to serve a wide range of communities.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm accordion-item">
+                        <div class="flex justify-between items-center cursor-pointer accordion-header">
+                            <h3 class="font-bold text-lg text-teal-800">Can I use ArogyaMitra for medical emergencies?</h3>
+                            <i class="fas fa-plus text-xl text-teal-600 accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="text-gray-600">
+                                **No, ArogyaMitra is not a substitute for professional medical advice.** In case of a medical emergency, please contact your doctor or dial your local emergency services immediately.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm accordion-item">
+                        <div class="flex justify-between items-center cursor-pointer accordion-header">
+                            <h3 class="font-bold text-lg text-teal-800">How accurate is the information?</h3>
+                            <i class="fas fa-plus text-xl text-teal-600 accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="text-gray-600">
+                                Our system aims to achieve at least 80% accuracy in answering health queries by using verified data from government health databases.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm accordion-item">
+                        <div class="flex justify-between items-center cursor-pointer accordion-header">
+                            <h3 class="font-bold text-lg text-teal-800">Is there a mobile app?</h3>
+                            <i class="fas fa-plus text-xl text-teal-600 accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="text-gray-600">
+                                Currently, ArogyaMitra is a web-based service accessible on all devices. We are exploring the development of a dedicated mobile app in the future.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="contact" class="bg-gray-100 py-12">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-6 md:mb-0">
+                        <div class="flex items-center mb-4">
+                            <img src="https://i.ibb.co/Kp9vTRvw/aarogyamitra.png" alt="ArogyaMitra Logo" class="h-8">
+                        </div>
+                        <p class="text-gray-600 max-w-md">
+                            Your health, simplified. Get accurate guidance and empower your community.
+                        </p>
+                    </div>
+                    <div class="flex space-x-8">
+                        <div>
+                            <h4 class="font-bold mb-4 text-teal-800">Quick Links</h4>
+                            <ul class="space-y-2">
+                                <li><a href="#" onclick="showPage('home-page')" class="text-gray-600 hover:text-teal-700 transition">Home</a></li>
+                                <li><a href="#features" class="text-gray-600 hover:text-teal-700 transition">Features</a></li>
+                                <li><a href="#videos" class="text-gray-600 hover:text-teal-700 transition">Videos</a></li>
+                                <li><a href="#faq" class="text-gray-600 hover:text-teal-700 transition">FAQ</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-4 text-teal-800">Contact Us</h4>
+                            <ul class="space-y-2">
+                                <li class="text-gray-600">Kolkata, West Bengal, India</li>
+                                <li class="text-gray-600">+91 6204923668</li>
+                                <li class="text-gray-600">support@arogyamitra.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-gray-300 mt-8 pt-8 text-center text-gray-600">
+                    <p>&copy; 2025 ArogyaMitra. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Floating Chat Button and Window -->
+        <div class="chat-container">
+            <!-- Floating Chat Button -->
+            <button id="chat-toggle-button" class="chat-button bg-teal-600 text-white hover:bg-teal-700">
+                <i class="fas fa-comments text-3xl"></i>
+            </button>
+
+            <!-- Chat Window -->
+            <div id="chat-window" class="chat-window">
+                <div class="p-4 flex justify-between items-center border-b border-gray-200 bg-gray-50">
+                    <h3 class="text-lg font-semibold text-teal-800">ArogyaMitra Chat</h3>
+                    <button id="close-chat-button" class="p-2 text-gray-500 hover:text-gray-800">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="chat-messages" class="p-6 h-96 overflow-y-auto">
+                    <div class="mb-4">
+                        <div class="bg-teal-50 text-teal-800 p-4 rounded-lg inline-block max-w-xs">
+                            <p>Hello! How can I assist you with your health concerns today?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-200 flex">
+                    <input
+                        type="text"
+                        id="user-input"
+                        placeholder="Describe your symptoms or ask a health question..."
+                        class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    >
+                    <button id="send-button" class="btn-primary ml-2 p-3 rounded-lg hover:bg-teal-700 transition">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Modal -->
+        <div id="video-modal" class="modal">
+            <div class="modal-content relative">
+                <span class="close-button text-white">&times;</span>
+                <div id="video-player-container" class="relative" style="padding-top: 56.25%;">
+                    <!-- Video will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot Page -->
+    <div id="chatbot-page" class="page">
+        <div class="flex items-center justify-center min-h-screen p-4 bg-gray-100 text-gray-800">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl h-[90vh] md:h-[80vh] flex flex-col overflow-hidden">
+                
+                <!-- Chat Header -->
+                <div class="bg-[#0f766e] text-white p-6 rounded-t-3xl shadow-md flex justify-between items-center">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center">
+                        <h1 class="text-2xl font-semibold mr-2">ArogyaMitra</h1>
+                        <span class="text-xs text-gray-200 mt-1 sm:mt-0 font-light">Your Health Assistant</span>
+                    </div>
+                    <div class="relative">
+                        <select id="languageSelect" class="bg-white text-gray-800 px-4 py-2 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0d6660]">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Message Display Area -->
+                <div id="messages" class="flex-1 overflow-y-auto p-6 flex flex-col space-y-4 bg-[#f1f5f9] scroll-smooth">
+                    <!-- Typing indicator -->
+                    <div id="typingIndicator" class="typing-indicator self-start hidden">
+                        <div class="message-bubble bot-message self-start">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick reply buttons -->
+                <div id="quickReplies" class="flex justify-center p-4 border-t border-gray-200 bg-gray-50 gap-2 flex-wrap quick-replies-transition">
+                    <!-- Buttons will be populated by JavaScript -->
+                </div>
+
+                <!-- Input Area -->
+                <div class="p-4 border-t border-gray-200 bg-gray-50 flex items-center gap-4">
+                    <input type="text" id="userInput" class="flex-1 p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0f766e] placeholder-gray-500" placeholder="Ask ArogyaMitra about your health...">
+                    <button id="sendBtn" class="bg-[#0f766e] text-white rounded-xl p-3 px-6 font-semibold shadow-md hover:bg-[#0d6660] transition-colors">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Back button -->
+        <div class="fixed top-4 left-4">
+            <button onclick="showPage('home-page')" class="bg-teal-600 text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </button>
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login-page" class="page">
+        <div class="h-screen flex items-center justify-center bg-gradient-to-r from-teal-200 to-teal-600">
+            <div class="w-full max-w-sm sm:max-w-md bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-teal-600 text-center mb-6">Log In</h2>
+                <p class="text-center text-gray-600 mb-6">Welcome back to ArogyaMitra</p>
+                <form class="space-y-4">
+                    <input type="email" placeholder="Email" required
+                           class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <input type="password" placeholder="Password" required
+                           class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <button type="submit"
+                            class="w-full bg-teal-600 text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition">
+                        Sign In
+                    </button>
+                </form>
+                <p class="text-center text-sm text-gray-600 mt-6">
+                    Don't have an account?
+                    <a href="#" onclick="showPage('signup-page')" class="text-teal-600 font-medium hover:underline">Sign Up</a>
+                </p>
+                <p class="text-center mt-2">
+                    <a href="#" onclick="showPage('home-page')" class="text-gray-500 text-sm hover:underline">← Back to Home</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Page -->
+    <div id="signup-page" class="page">
+        <div class="h-screen flex items-center justify-center bg-gradient-to-r from-teal-200 to-teal-600">
+            <div class="w-full max-w-sm sm:max-w-md bg-gradient-to-br from-white to-gray-50 p-6 sm:p-8 rounded-xl shadow-lg">
+                <!-- Heading -->
+                <h2 class="text-2xl font-bold text-teal-600 text-center mb-2">Sign Up</h2>
+                <p class="text-center text-gray-600 mb-6">Create your ArogyaMitra account</p>
+
+                <!-- Form -->
+                <form class="space-y-4">
+                    <input type="text" placeholder="Full Name"
+                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <input type="email" placeholder="Email"
+                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <input type="password" placeholder="Password"
+                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <input type="password" placeholder="Confirm Password"
+                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+
+                    <button type="submit"
+                        class="w-full bg-teal-600 text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition">
+                        Sign Up
+                    </button>
+                </form>
+
+                <!-- Footer Links -->
+                <p class="text-center text-sm text-gray-600 mt-6">
+                    Already have an account?
+                    <a href="#" onclick="showPage('login-page')" class="text-teal-600 font-medium hover:underline">Log In</a>
+                </p>
+                <p class="text-center mt-2">
+                    <a href="#" onclick="showPage('home-page')" class="text-gray-500 text-sm hover:underline">← Back to Home</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Page Navigation, Chat & Mobile Menu -->
+    <script>
+        // Page navigation functionality
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show the selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Mobile menu functionality
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileLinks = document.getElementById('mobile-links');
+        const mobileMenuIcon = document.getElementById('mobile-menu-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+            const isHidden = mobileLinks.classList.contains('hidden');
+            if (isHidden) {
+                mobileLinks.classList.remove('hidden');
+                mobileMenuIcon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+            } else {
+                mobileLinks.classList.add('hidden');
+                mobileMenuIcon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+            }
+        });
+
+        // Floating Chat Button Functionality
+        const chatToggleButton = document.getElementById('chat-toggle-button');
+        const closeChatButton = document.getElementById('close-chat-button');
+        const chatWindow = document.getElementById('chat-window');
+
+        chatToggleButton.addEventListener('click', () => {
+            chatWindow.classList.toggle('open');
+            chatToggleButton.querySelector('i').classList.toggle('fa-times');
+            chatToggleButton.querySelector('i').classList.toggle('fa-comments');
+        });
+
+        closeChatButton.addEventListener('click', () => {
+            chatWindow.classList.remove('open');
+            chatToggleButton.querySelector('i').classList.add('fa-comments');
+            chatToggleButton.querySelector('i').classList.remove('fa-times');
+        });
+
+
+        // Chat functionality
+        document.getElementById('send-button').addEventListener('click', function() {
+            const userInput = document.getElementById('user-input').value;
+            if (userInput.trim() !== '') {
+                const chatMessages = document.getElementById('chat-messages');
+                chatMessages.innerHTML += `
+                    <div class="mb-4 text-right">
+                        <div class="bg-teal-600 text-white p-4 rounded-lg inline-block max-w-xs">
+                            <p>${userInput}</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('user-input').value = '';
+                // Simulate response
+                setTimeout(() => {
+                    chatMessages.innerHTML += `
+                        <div class="mb-4">
+                            <div class="bg-gray-200 text-gray-800 p-4 rounded-lg inline-block max-w-xs">
+                                <p>Thank you for your question. Here's what you need to know: [Detailed response based on verified health sources].</p>
+                            </div>
+                        </div>
+                    `;
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+            }
+        });
+
+        // FAQ Accordion functionality
+        const accordionItems = document.querySelectorAll('.accordion-item');
+
+        accordionItems.forEach(item => {
+            const header = item.querySelector('.accordion-header');
+            const content = item.querySelector('.accordion-content');
+            const icon = item.querySelector('.accordion-icon');
+
+            header.addEventListener('click', () => {
+                const isOpen = content.classList.contains('open');
+                
+                // Close all other open accordion items
+                accordionItems.forEach(otherItem => {
+                    const otherContent = otherItem.querySelector('.accordion-content');
+                    const otherHeader = otherItem.querySelector('.accordion-header');
+                    const otherIcon = otherItem.querySelector('.accordion-icon');
+                    if (otherContent.classList.contains('open') && otherItem !== item) {
+                        otherContent.classList.remove('open');
+                        otherHeader.classList.remove('open');
+                        otherIcon.classList.remove('fa-times');
+                        otherIcon.classList.add('fa-plus');
+                    }
+                });
+
+                // Toggle the clicked item
+                if (!isOpen) {
+                    content.classList.add('open');
+                    header.classList.add('open');
+                    icon.classList.remove('fa-plus');
+                    icon.classList.add('fa-times');
+                } else {
+                    content.classList.remove('open');
+                    header.classList.remove('open');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-plus');
+                }
+            });
+        });
+
+        // Continuous typing effect functionality
+        const textElement = document.getElementById('typing-text');
+        const phrases = [
+            "We provide support in different languages: Hindi, English, Bengali, Marathi, Tamil, Telugu, Malayalam, Hinglish, and Odia."
+        ];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isTyping = true;
+
+        function type() {
+            if (isTyping) {
+                const currentPhrase = phrases[phraseIndex];
+                if (charIndex < currentPhrase.length) {
+                    textElement.textContent += currentPhrase.charAt(charIndex);
+                    charIndex++;
+                    setTimeout(type, 50);
+                } else {
+                    isTyping = false;
+                    setTimeout(erase, 2000);
+                }
+            }
+        }
+
+        function erase() {
+            if (!isTyping) {
+                if (textElement.textContent.length > 0) {
+                    textElement.textContent = textElement.textContent.slice(0, -1);
+                    setTimeout(erase, 30);
+                } else {
+                    isTyping = true;
+                    phraseIndex = (phraseIndex + 1) % phrases.length;
+                    charIndex = 0;
+                    setTimeout(type, 500);
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            type();
+        });
+
+        // Video Modal Functionality
+        const videoModal = document.getElementById('video-modal');
+        const videoPlayerContainer = document.getElementById('video-player-container');
+        const closeButton = videoModal.querySelector('.close-button');
+
+        document.querySelectorAll('.video-container').forEach(container => {
+            container.addEventListener('click', () => {
+                const videoId = container.dataset.videoId;
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                iframe.title = 'YouTube video player';
+                iframe.frameborder = '0';
+                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+                iframe.allowfullscreen = true;
+                iframe.classList.add('absolute', 'inset-0', 'w-full', 'h-full');
+                
+                videoPlayerContainer.innerHTML = '';
+                videoPlayerContainer.appendChild(iframe);
+                videoModal.classList.add('open');
+            });
+        });
+
+        closeButton.addEventListener('click', () => {
+            videoModal.classList.remove('open');
+            // Stop the video by removing the iframe
+            videoPlayerContainer.innerHTML = '';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === videoModal) {
+                videoModal.classList.remove('open');
+                videoPlayerContainer.innerHTML = '';
+            }
+        });
+        
+        // Chatbot functionality
+        const messagesEl = document.getElementById('messages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const quickReplies = document.getElementById('quickReplies');
+        const languageSelect = document.getElementById('languageSelect');
+        let chatHistory = [];
+        let currentLanguage = 'en';
+
+        const OPENROUTER_API_KEY = "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";
+        const MODEL_ID = "deepseek/deepseek-chat-v3.1:free";
+        const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+
+        // This object now holds all the language-specific content and quick reply mappings
+        const config = {
+            languages: [
+                {
+                    code: 'en',
+                    name: 'English',
+                    greeting: "Hello! I am ArogyaMitra, your friendly health assistant. I can help you with:\n* **Preventive healthcare**\n* **Common disease symptoms**\n* **Vaccination schedules**\n* **Outbreak alerts**\n\nHow can I help you today?",
+                    prompt: "You are a helpful and friendly health assistant named ArogyaMitra. Your goal is to provide clear, concise, and easy-to-understand information about public health topics like preventive healthcare, common disease symptoms, and vaccination schedules. Always present information in a structured way using headings, bullet points, and bold text to make it easy to read. Always advise the user to consult a professional for medical diagnosis or treatment. For real-time updates, you can check for outbreak alerts. Additionally, if a user asks for nearby healthcare facilities (hospitals, clinics, or vaccination centers), first ask them to provide their location. Then, based on the location they provide, offer general information about finding such services. Remind them that you cannot provide real-time, specific locations and that they should use a map service for the most accurate results.",
+                    quickReplyMap: {
+                        initial: ["What are the symptoms of dengue fever?", "Tips for a healthy diet", "Tips to prevent monsoon illnesses"],
+                        dengue: ["How to prevent mosquito bites?", "What are the symptoms of malaria?", "What to eat during fever?"],
+                        diet: ["Tips for a balanced diet", "How to stay hydrated?", "Healthy recipes for kids"],
+                        monsoon: ["What are common monsoon diseases?", "How to boost immunity in rainy season?", "Tips for home hygiene"],
+                        general: ["What are the benefits of regular exercise?", "How to manage stress?", "What is a balanced meal?"]
+                    },
+                    placeholder: "Ask ArogyaMitra about your health..."
+                },
+                {
+                    code: 'hi',
+                    name: 'Hindi',
+                    greeting: "नमस्ते! मैं आरोग्यमित्र, आपकी स्वास्थ्य सहायक हूँ। मैं आपकी इन चीज़ों में मदद कर सकती हूँ:\n* **निवारक स्वास्थ्य देखभाल**\n* **सामान्य बीमारी के लक्षण**\n* **टीकाकरण कार्यक्रम**\n* **प्रकोप अलर्ट**\n\nआज मैं आपकी क्या मदद कर सकती हूँ?",
+                    prompt: "आप आरोग्यमित्र नामक एक मददगार और मैत्रीपूर्ण स्वास्थ्य सहायक हैं। आपका लक्ष्य सार्वजनिक स्वास्थ्य विषयों जैसे निवारक स्वास्थ्य देखभाल, सामान्य बीमारी के लक्षण और टीकाकरण कार्यक्रम के बारे में स्पष्ट, संक्षिप्त और आसानी से समझ में आने वाली जानकारी प्रदान करना है। जानकारी को हमेशा शीर्षक, बुलेट पॉइंट और बोल्ड टेक्स्ट का उपयोग करके एक संरचित तरीके से प्रस्तुत करें ताकि इसे पढ़ना आसान हो। हमेशा उपयोगकर्ता को चिकित्सा निदान या उपचार के लिए एक पेशेवर से परामर्श करने की सलाह दें। वास्तविक समय के अपडेट के लिए, आप प्रकोप अलर्ट की जांच कर सकते हैं। इसके अतिरिक्त, यदि कोई उपयोगकर्ता आस-पास के स्वास्थ्य सेवा केंद्रों (अस्पतालों, क्लिनिकों, या टीकाकरण केंद्रों) के बारे में पूछता है, तो पहले उनसे उनका स्थान प्रदान करने के लिए कहें। फिर, उनके द्वारा प्रदान किए गए स्थान के आधार पर, ऐसी सेवाओं को खोजने के बारे में सामान्य जानकारी दें। उन्हें याद दिलाएं कि आप वास्तविक समय, विशिष्ट स्थान प्रदान नहीं कर सकते हैं और उन्हें सबसे सटीक परिणामों के लिए एक मानचित्र सेवा का उपयोग करना चाहिए।",
+                    quickReplyMap: {
+                        initial: ["डेंगू बुखार के क्या लक्षण हैं?", "स्वस्थ आहार के लिए सुझाव", "मानसून में बीमारियों से बचने के उपाय"],
+                        dengue: ["मच्छरों से कैसे बचें?", "मलेरिया के लक्षण क्या हैं?", "बुखार में क्या खाएं?"],
+                        diet: ["संतुलित आहार के लिए सुझाव", "खुद को हाइड्रेटेड कैसे रखें?", "बच्चों के लिए स्वस्थ व्यंजन"],
+                        monsoon: ["मानसून में सामान्य बीमारियाँ क्या हैं?", "बरसात में प्रतिरक्षा कैसे बढ़ाएं?", "घर की स्वच्छता के लिए सुझाव"],
+                        general: ["नियमित व्यायाम के क्या लाभ हैं?", "तनाव को कैसे नियंत्रित करें?", "संतुलित भोजन क्या है?"]
+                    },
+                    placeholder: "आरोग्यमित्र से अपने स्वास्थ्य के बारे में पूछें..."
+                },
+                {
+                    code: 'mr',
+                    name: 'Marathi',
+                    greeting: "नमस्कार! मी आरोग्यमित्र, तुमची आरोग्य सहाय्यक आहे. मी तुम्हाला या बाबतीत मदत करू शकते:\n* **प्रतिबंधक आरोग्य सेवा**\n* **सामान्य रोगांची लक्षणे**\n* **लसीकरण वेळापत्रक**\n* **साथीच्या रोगांच्या सूचना**\n\nआज मी तुम्हाला कशी मदत करू शकेन?",
+                    prompt: "आपण आरोग्यमित्र नावाचे एक मदतगार आणि मैत्रीपूर्ण आरोग्य सहाय्यक आहात. तुमचे ध्येय सार्वजनिक आरोग्य विषयांवर, जसे की प्रतिबंधक आरोग्य सेवा, सामान्य रोगांची लक्षणे आणि लसीकरण वेळापत्रक, याबद्दल स्पष्ट, संक्षिप्त आणि सहज समजून घेता येईल अशी माहिती देणे आहे। माहिती नेहमी शीर्षके, बुलेट पॉईंट्स आणि बोल्ड टेक्स्ट वापरून सुव्यवस्थित पद्धतीने सादर करा जेणेकरून ती वाचायला सोपी जाईल. नेहमी वापरकर्त्याला वैद्यकीय निदानाच्या वेळी किंवा उपचारासाठी तज्ञाचा सल्ला घेण्याचा सल्ला द्या। रिअल-टाइम अपडेट्ससाठी, तुम्ही साथीच्या रोगांच्या सूचना तपासू शकता. याव्यतिरिक्त, जर एखादा वापरकर्ता जवळपासच्या आरोग्य सेवा केंद्रांबद्दल (रुग्णालये, दवाखाने किंवा लसीकरण केंद्रे) विचारतो, तर त्यांना आधी त्यांचे स्थान विचारून घ्या। त्यानंतर, त्यांनी दिलेल्या स्थानानुसार, अशा सेवा शोधण्याबद्दल सामान्य माहिती द्या। त्यांना आठवण करून द्या की तुम्ही वास्तविक-वेळ, विशिष्ट स्थाने देऊ शकत नाही आणि सर्वात अचूक परिणामांसाठी त्यांनी नकाशा सेवेचा वापर करावा।",
+                    quickReplyMap: {
+                        initial: ["डेंग्यू तापाची लक्षणे काय आहेत?", "निरोगी आहारासाठी टिप्स", "पावसाळ्यातील रोगांपासून बचाव करण्याच्या टिप्स"],
+                        dengue: ["डासांपासून कसे वाचायचे?", "मलेरियाची लक्षणे काय आहेत?", "ताप आल्यावर काय खावे?"],
+                        diet: ["समतोल आहारासाठी टिप्स", "स्वत:ला हायड्रेटेड कसे ठेवावे?", "मुलांसाठी निरोगी रेसिपी"],
+                        monsoon: ["पावसाळ्यातील सामान्य रोग कोणते आहेत?", "बरसात में प्रतिरक्षा कशी वाढवावी?", "घराच्या स्वच्छतेसाठी टिप्स"],
+                        general: ["नियमित व्यायामाचे फायदे काय आहेत?", "तणाव कसा नियंत्रित करावा?", "समतोल आहार म्हणजे काय?"]
+                    },
+                    placeholder: "आरोग्यमित्रला तुमच्या आरोग्याबद्दल विचारा..."
+                },
+                {
+                    code: 'bn',
+                    name: 'Bengali',
+                    greeting: "হ্যালো! আমি আরোগ্যমিত্র, আপনার বন্ধুত্বপূর্ণ স্বাস্থ্য সহকারী। আমি আপনাকে এই বিষয়ে সাহায্য করতে পারি:\n* **প্রতিরোধমূলক স্বাস্থ্যসেবা**\n* **সাধারণ রোগের লক্ষণ**\n* **টিকা দেওয়ার সময়সূচী**\n* **প্রাদুর্ভাবের সতর্কতা**\n\nআজ আমি আপনাকে কিভাবে সাহায্য করতে পারি?",
+                    prompt: "আপনি आরোগ্যমিত্র নামে একটি সহায়ক এবং বন্ধুত্বপূর্ণ স্বাস্থ্য সহায়ক। আপনার লক্ষ্য হল প্রতিরোধমূলক স্বাস্থ্যসেবা, সাধারণ রোগের লক্ষণ এবং টিকা দেওয়ার সময়সূচীর মতো জনস্বাস্থ্য বিষয় সম্পর্কে পরিষ্কার, সংক্ষিপ্ত এবং সহজে বোঝা যায় এমন তথ্য প্রদান করা। তথ্য সর্বদা শিরোনাম, বুলেট পয়েন্ট এবং বোল্ড টেক্সট ব্যবহার করে একটি কাঠামোগত উপায়ে উপস্থাপন করুন যাতে এটি পড়া সহজ হয়। সর্বদা ব্যবহারকারীকে চিকিৎসা নির্ণয় বা চিকিৎসার জন্য একজন পেশাদারের সাথে পরামর্শ করার পরামর্শ দিন। রিয়েল-টাইম আপডেটের জন্য, আপনি প্রাদুর্ভাবের সতর্কতা পরীক্ষা করতে পারেন। উপরন্তু, যদি একজন ব্যবহারকারী কাছাকাছি স্বাস্থ্যসেবা কেন্দ্র (হাসপাতাল, ক্লিনিক বা টিকাদান কেন্দ্র) সম্পর্কে জিজ্ঞাসা করেন, প্রথমে তাদের অবস্থান জানাতে বলুন। তারপর, তাদের দেওয়া অবস্থানের উপর ভিত্তি করে, সেই ধরনের পরিষেবাগুলি খুঁজে বের করার জন্য সাধারণ তথ্য দিন। তাদের মনে করিয়ে দিন যে আপনি রিয়েল-টাইম, নির্দিষ্ট অবস্থান দিতে পারবেন না এবং সবচেয়ে সঠিক ফলাফলের জন্য তাদের একটি মানচিত্র পরিষেবা ব্যবহার করা উচিত।",
+                    quickReplyMap: {
+                        initial: ["ডেঙ্গু জ্বরের লক্ষণ কি?", "একটি স্বাস্থ্যকর খাদ্যের জন্য টিপস", "বর্ষাকালের রোগ প্রতিরোধের টিপ스"],
+                        dengue: ["মশা থেকে কিভাবে বাঁচা যায়?", "ম্যালেরিয়ার লক্ষণ কি?", "জ্বরে কী খাওয়া উচিত?"],
+                        diet: ["সুষম খাদ্যের জন্য টিপস", "কিভাবে নিজেকে হাইড্রেটেড রাখবেন?", "শিশুদের জন্য স্বাস্থ্যকর রেসিপি"],
+                        monsoon: ["বর্ষাকালের সাধারণ রোগ কি?", "বর্ষাকালে রোগ প্রতিরোধ ক্ষমতা কিভাবে বাড়াবেন?", "ঘরের পরিচ্ছন্নতার টিপস"],
+                        general: ["নিয়মিত ব্যায়ামের উপকারিতা কি?", "কিভাবে চাপ নিয়ন্ত্রণ করবেন?", "একটি সুষম খাবার কি?"]
+                    },
+                    placeholder: "আরোগ্যমিত্রকে আপনার স্বাস্থ্য সম্পর্কে জিজ্ঞাসা করুন..."
+                },
+                {
+                    code: 'ta',
+                    name: 'Tamil',
+                    greeting: "வணக்கம்! நான் ஆரோக்கியமித்ரா, உங்கள் நட்புரீதியான சுகாதார உதவியாளர். நான் உங்களுக்கு இந்த விஷயங்களில் உதவ முடியும்:\n* **தடுப்பு சுகாதாரப் பராமரிப்பு**\n* **பொதுவான நோய்களின் அறிகுறிகள்**\n* **தடுப்பூசி அட்டவணைகள்**\n* **நோய் பரவல் எச்சரிக்கைகள்**\n\nஇன்று நான் உங்களுக்கு எப்படி உதவ முடியும்?",
+                    prompt: "நீங்கள் ஆரோக்கியமித்ரா என்ற பெயருடைய ஒரு பயனுள்ள மற்றும் நட்புரீதியான சுகாதார உதவியாளர். தடுப்பு சுகாதாரப் பராமரிப்பு, பொதுவான நோய்களின் அறிகுறிகள் மற்றும் தடுப்பூசி அட்டவணைகள் போன்ற பொது சுகாதாரத் தலைப்புகள் பற்றி தெளிவான, சுருக்கமான மற்றும் எளிதில் புரிந்துகொள்ளக்கூடிய தகவல்களை வழங்குவதே உங்கள் நோக்கம். தகவலை எப்போதும் தலைப்புகள், புல்லட் பாயிண்டுகள் மற்றும் போல்ட் எழுத்துக்களைப் பயன்படுத்தி ஒரு கட்டமைக்கப்பட்ட முறையில் வழங்கவும் ताकि எளிதாக வாசிக்க શકાય. மருத்துவ நோயறிதல் அல்லது சிகிச்சைக்கு எப்போதும் ஒரு நிபுணரை அணுகுமாறு பயனருக்கு அறிவுறுத்துங்கள். நிகழ்நேர புதுப்பிப்புகளுக்கு, நீங்கள் நோய் பரவல் எச்சரிக்கைகளை சரிபார்க்கலாம். மேலும், ஒரு பயனர் அருகிலுள்ள சுகாதார வசதிகள் (மருத்துவமனைகள், கிளினிக்குகள் அல்லது தடுப்பூசி மையங்கள்) பற்றி கேட்டால், முதலில் அவர்களின் இருப்பிடத்தை வழங்கச் சொல்லுங்கள். பின்னர், அவர்கள் வழங்கிய இருப்பிடத்தின் அடிப்படையில், அத்தகைய சேவைகளைக் கண்டுபிடிப்பது பற்றிய பொதுவான தகவலை வழங்குங்கள். நீங்கள் நிகழ்நேர, குறிப்பிட்ட இருப்பிடங்களை வழங்க முடியாது என்பதையும், மிகவும் துல்லியமான முடிவுகளுக்கு அவர்கள் ஒரு வரைபட சேவையைப் பயன்படுத்த வேண்டும் என்பதையும் அவர்களுக்கு நினைவூட்டுங்கள்.",
+                    quickReplyMap: {
+                        initial: ["டெங்கு காய்ச்சலின் அறிகுறிகள் என்ன?", "ஆரோக்கியமான உணவுக்கான குறிப்புகள்", "பருவமழை நோய்களைத் தடுக்கும் குறிப்புகள்"],
+                        dengue: ["கொசுக்களிடமிரு
