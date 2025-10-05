@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArogyaMitra - Smart Public Health Assistant for Rural India</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+/* Hide all pages by default */
+.page {
+    display: none;
+}
+
+/* Show the active page */
+.page.active {
+    display: block;
+}
+</style>
+    
+</head>
+<body class="bg-white text-gray-800">
+    <!-- Navigation between pages -->
+    <div id="home-page" class="page active">
+        <!-- Responsive Header -->
+        <header class="fixed top-0 z-50 w-full bg-white shadow-sm">
+            <nav class="max-w-7xl mx-auto px-6">
+                <div class="h-16 flex items-center justify-between">
+                    <!-- Brand with image logo -->
+                    <a href="#" class="flex items-center" onclick="showPage('home-page')">
+                        <img src="https://i.ibb.co/Kp9vTRvw/aarogyamitra.png" alt="ArogyaMitra Logo" class="h-10 w-40 object-contain" />
+                    </a>
+
+                    <!-- Desktop links -->
+                    <div class="hidden md:flex items-center space-x-2">
+                        <a href="#" onclick="showPage('home-page')" class="px-3 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-gray-100 transition-colors duration-200">Home</a>
+                        <a href="#features" class="px-3 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-gray-100 transition-colors duration-200">Features</a>
+                        <a href="#videos" class="px-3 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-gray-100 transition-colors duration-200">Videos</a>
+                        <a href="#faq" class="px-3 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-gray-100 transition-colors duration-200">FAQ</a>
+                        <a href="#contact" class="px-3 py-2 rounded-lg text-gray-600 hover:text-teal-700 hover:bg-gray-100 transition-colors duration-200">Contact</a>
+                        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+                        <a href="#" onclick="showPage('login-page')" class="px-4 py-2 rounded-lg bg-transparent text-teal-600 border border-teal-600 hover:bg-teal-600 hover:text-white transition-colors duration-200">Login</a>
+                        <a href="#" onclick="showPage('signup-page')" class="px-4 py-2 rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors duration-200">Sign up</a>
+                    </div>
+
+                    <!-- Mobile menu button -->
+                    <button class="md:hidden inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:bg-gray-100" id="mobile-menu-button" aria-label="Toggle menu">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path id="mobile-menu-icon" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Mobile links -->
+                <div id="mobile-links" class="hidden md:hidden pb-3 space-y-1">
+                    <a href="#" onclick="showPage('home-page')" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Home</a>
+                    <a href="#features" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Features</a>
+                    <a href="#videos" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Videos</a>
+                    <a href="#faq" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">FAQ</a>
+                    <a href="#contact" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Contact</a>
+                    <div class="flex gap-2 px-3 pt-2">
+                        <a href="#" onclick="showPage('login-page')" class="flex-1 text-center px-3 py-2 rounded-lg bg-white text-teal-600 border border-teal-600 hover:bg-gray-100">Login</a>
+                        <a href="#" onclick="showPage('signup-page')" class="flex-1 text-center px-3 py-2 rounded-lg bg-teal-600 text-white hover:bg-teal-700">Sign up</a>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Content sections with IDs for navigation -->
+        <!-- Hero Section with mobile-friendly buttons -->
+        <section id="home" class="hero-bg py-20 mt-16">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-teal-800 mb-4 animate-hero">
+                    Smart Public Health Assistant for Rural India
+                </h1>
+                <p class="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto typing-effect-container">
+                    <span id="typing-text"></span>
+                    <span class="cursor"></span>
+                </p>
+                <!-- Updated button group for mobile friendliness -->
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                    <a href="https://wa.me/911234567890?text=Hello%20ArogyaMitra,%20I%20have%20a%20health-related%20query." class="btn-primary py-3 px-6 rounded-lg font-medium transition flex items-center justify-center space-x-2 w-full md:w-auto">
+                        <i class="fab fa-whatsapp text-lg"></i>
+                        <span>Chat on WhatsApp</span>
+                    </a>
+                    <a href="sms:+911234567890?body=HEALTH" class="btn-secondary py-3 px-6 rounded-lg font-medium transition flex items-center justify-center space-x-2 w-full md:w-auto">
+                        <i class="fas fa-message text-lg"></i>
+                        <span>SMS 'HEALTH' to +91 12345 67890</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-16 text-teal-800">Key Features of ArogyaMitra</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-file-medical text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Real-Time Disease Alerts</h3>
+                        <p class="text-gray-600">
+                            Receive instant alerts about local disease outbreaks and learn essential preventive measures.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-syringe text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Personalized Vaccination Reminders</h3>
+                        <p class="text-gray-600">
+                            Get timely reminders for you and your family's vaccination schedules directly via chat.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-database text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Government Health Database Integration</h3>
+                        <p class="text-gray-600">
+                            Our information is sourced directly from verified government health databases for 80% accuracy.
+                        </p>
+                    </div>
+                    
+                    <!-- New Features Added Below -->
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-stethoscope text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">AI-Powered Symptom Checker</h3>
+                        <p class="text-gray-600">
+                            Get a preliminary assessment of your symptoms with our advanced AI. It helps you understand potential conditions and next steps, but always consult a doctor for a diagnosis.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-chart-line text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Personalized Health Insights</h3>
+                        <p class="text-gray-600">
+                            Receive tailored advice on nutrition, fitness, and wellness based on your profile. ArogyaMitra learns from your interactions to provide a truly personalized experience.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-utensils text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Diet and Nutrition Tracker</h3>
+                        <p class="text-gray-600">
+                            Log your meals and get nutritional analysis. ArogyaMitra helps you make healthier food choices and maintain a balanced diet for overall well-being.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-running text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Fitness and Workout Plans</h3>
+                        <p class="text-gray-600">
+                            Create custom workout routines or choose from our pre-designed plans. Track your progress and get tips to stay motivated on your fitness journey.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-teal-600 mb-6">
+                            <i class="fas fa-heart text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Mental Health & Wellness</h3>
+                        <p class="text-gray-600">
+                            Access guided meditations, stress-relief techniques, and resources for mental well-being. ArogyaMitra is here to support both your physical and mental health.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-teal-800">How ArogyaMitra Works</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-sms text-2xl text-teal-600 mr-3"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Simple Access via SMS & WhatsApp</h3>
+                        <p class="text-gray-600 mb-4">
+                            Just send a message to our dedicated number to start a conversation about your health queries. No app downloads required.
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-globe text-2xl text-green-600 mr-3"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Multilingual Support</h3>
+                        <p class="text-gray-600 mb-4">
+                            Communicate in your preferred language, including Hindi, English, and other regional languages.
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-heartbeat text-2xl text-pink-600 mr-3"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Instant Health Answers</h3>
+                        <p class="text-gray-600 mb-4">
+                            Get immediate, accurate, and easy-to-understand information on disease symptoms and preventive care.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Awareness Section -->
+        <section id="videos" class="py-20 bg-gray-100">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-teal-800">Video Health Awareness</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Video Card 1 -->
+                    <div class="video-card">
+                        <div class="relative video-container cursor-pointer" data-video-id="3zElj70dYJ4">
+                            <img src="https://img.youtube.com/vi/3zElj70dYJ4/hqdefault.jpg" alt="Health Awareness Video 1" class="w-full h-auto object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                <i class="fas fa-play-circle text-white text-5xl play-icon"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-lg text-teal-800 mb-1">Understanding the Signs of Diabetes</h3>
+                            <p class="text-sm text-gray-600 mb-4">A short video on the basics of diabetes and its symptoms.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Card 2 -->
+                    <div class="video-card">
+                        <div class="relative video-container cursor-pointer" data-video-id="eYP920Uiiqw">
+                            <img src="https://img.youtube.com/vi/eYP920Uiiqw/hqdefault.jpg" alt="Health Awareness Video 2" class="w-full h-auto object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                <i class="fas fa-play-circle text-white text-5xl play-icon"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-lg text-teal-800 mb-1">The Importance of Proper Handwashing</h3>
+                            <p class="text-sm text-gray-600 mb-4">Handwashing is crucial for preventing the spread of diseases.</p>
+                        </div>
+                    </div>
+
+                    <!-- Video Card 3 -->
+                    <div class="video-card">
+                        <div class="relative video-container cursor-pointer" data-video-id="lEZbSaikBTw">
+                            <img src="https://img.youtube.com/vi/lEZbSaikBTw/hqdefault.jpg" alt="Health Awareness Video 3" class="w-full h-auto object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                <i class="fas fa-play-circle text-white text-5xl play-icon"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-lg text-teal-800 mb-1">How to Protect Your Family from Dengue Fever</h3>
+                            <p class="text-sm text-gray-600 mb-4">Essential tips to prevent mosquito-borne illnesses.</p>
+                        </div>
+                    </div>
+
+                    <!-- Video Card 4 -->
+                    <div class="video-card">
+                        <div class="relative video-container cursor-pointer" data-video-id="W4HDj2CcPAM">
+                            <img src="https://img.youtube.com/vi/W4HDj2CcPAM/hqdefault.jpg" alt="Health Awareness Video 4" class="w-full h-auto object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                <i class="fas fa-play-circle text-white text-5xl play-icon"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-lg text-teal-800 mb-1">A Guide to Mental Health First Aid</h3>
+                            <p class="text-sm text-gray-600 mb-4">Learn how to support someone with a mental health concern.</p>
+                        </div>
+                    </div>
+
+                    <!-- Video Card 5 -->
+                    <div class="video-card">
+                        <div class="relative video-container cursor-pointer" data-video-id="QF3eOPim5Hk">
+                            <img src="https://img.youtube.com/vi/QF3eOPim5Hk/hqdefault.jpg" alt="Health Awareness Video 5" class="w-full h-auto object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                <i class="fas fa-play-circle text-white text-5xl play-icon"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-lg text-teal-800 mb-1">Nutrition for a Healthy Lifestyle</h3>
+                            <p class="text-sm text-gray-600 mb-4">Simple tips for a balanced and nutritious diet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- FAQ Section -->
+        <section id="faq" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-teal-800">Frequently Asked Questions</h2>
+                <div class="max-w-4xl mx-auto space-y-4">
+                    <div class="bg-white p-6 rounded-lg shadow-sm accordion-item">
+                        <div class="flex justify-between items-center cursor-pointer accordion-header">
+                            <h3 class="font-bold text-lg text-teal-800">Who is ArogyaMitra for?</h3>
+                            <i class="fas fa-plus text-xl text-teal-600 accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="text-gray-600">
+                                ArogyaMitra is specifically designed to provide essential health information to individuals in rural and semi-urban communities across India.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm accordion-item">
+                        <div class="flex justify-between items-center cursor-pointer accordion-header">
+                            <h3 class="font-bold text-lg text-teal-800">How does ArogyaMitra get its information?</h3>
+                            <i class="fas fa-plus text-xl text-teal-600 accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="text-gray-600">
+                                The chatbot is integrated with official government health databases to ensure all information about diseases, vaccinations, and alerts is accurate and reliable.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm accordion-item">
+                        <div class="flex justify-between items-center cursor-pointer accordion-header">
+                            <h3 class="font-bold text-lg text-teal-800">What languages does the chatbot support?</h3>
+                            <i class="fas fa-plus text-xl text-teal-600 accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="text-gray-600">
+                                The chatbot is multilingual and currently supports Hindi, English, Bengali, Marathi, Tamil, Telugu, Malayalam, Hinglish, and Odia to serve a wide range of communities.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm accordion-item">
+                        <div class="flex justify-between items-center cursor-pointer accordion-header">
+                            <h3 class="font-bold text-lg text-teal-800">Can I use ArogyaMitra for medical emergencies?</h3>
+                            <i class="fas fa-plus text-xl text-teal-600 accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="text-gray-600">
+                                **No, ArogyaMitra is not a substitute for professional medical advice.** In case of a medical emergency, please contact your doctor or dial your local emergency services immediately.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm accordion-item">
+                        <div class="flex justify-between items-center cursor-pointer accordion-header">
+                            <h3 class="font-bold text-lg text-teal-800">How accurate is the information?</h3>
+                            <i class="fas fa-plus text-xl text-teal-600 accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="text-gray-600">
+                                Our system aims to achieve at least 80% accuracy in answering health queries by using verified data from government health databases.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm accordion-item">
+                        <div class="flex justify-between items-center cursor-pointer accordion-header">
+                            <h3 class="font-bold text-lg text-teal-800">Is there a mobile app?</h3>
+                            <i class="fas fa-plus text-xl text-teal-600 accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="text-gray-600">
+                                Currently, ArogyaMitra is a web-based service accessible on all devices. We are exploring the development of a dedicated mobile app in the future.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="contact" class="bg-gray-100 py-12">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-6 md:mb-0">
+                        <div class="flex items-center mb-4">
+                            <img src="https://i.ibb.co/Kp9vTRvw/aarogyamitra.png" alt="ArogyaMitra Logo" class="h-8">
+                        </div>
+                        <p class="text-gray-600 max-w-md">
+                            Your health, simplified. Get accurate guidance and empower your community.
+                        </p>
+                    </div>
+                    <div class="flex space-x-8">
+                        <div>
+                            <h4 class="font-bold mb-4 text-teal-800">Quick Links</h4>
+                            <ul class="space-y-2">
+                                <li><a href="#" onclick="showPage('home-page')" class="text-gray-600 hover:text-teal-700 transition">Home</a></li>
+                                <li><a href="#features" class="text-gray-600 hover:text-teal-700 transition">Features</a></li>
+                                <li><a href="#videos" class="text-gray-600 hover:text-teal-700 transition">Videos</a></li>
+                                <li><a href="#faq" class="text-gray-600 hover:text-teal-700 transition">FAQ</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-4 text-teal-800">Contact Us</h4>
+                            <ul class="space-y-2">
+                                <li class="text-gray-600">Kolkata, West Bengal, India</li>
+                                <li class="text-gray-600">+91 6204923668</li>
+                                <li class="text-gray-600">support@arogyamitra.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-gray-300 mt-8 pt-8 text-center text-gray-600">
+                    <p>&copy; 2025 ArogyaMitra. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Floating Chat Button and Window -->
+        <div class="chat-container">
+            <!-- Floating Chat Button -->
+            <button id="chat-toggle-button" class="chat-button bg-teal-600 text-white hover:bg-teal-700">
+                <i class="fas fa-comments text-3xl"></i>
+            </button>
+
+            <!-- Chat Window -->
+            <div id="chat-window" class="chat-window">
+                <div class="p-4 flex justify-between items-center border-b border-gray-200 bg-gray-50">
+                    <h3 class="text-lg font-semibold text-teal-800">ArogyaMitra Chat</h3>
+                    <button id="close-chat-button" class="p-2 text-gray-500 hover:text-gray-800">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="chat-messages" class="p-6 h-96 overflow-y-auto">
+                    <div class="mb-4">
+                        <div class="bg-teal-50 text-teal-800 p-4 rounded-lg inline-block max-w-xs">
+                            <p>Hello! How can I assist you with your health concerns today?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-200 flex">
+                    <input
+                        type="text"
+                        id="user-input"
+                        placeholder="Describe your symptoms or ask a health question..."
+                        class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    >
+                    <button id="send-button" class="btn-primary ml-2 p-3 rounded-lg hover:bg-teal-700 transition">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Modal -->
+        <div id="video-modal" class="modal">
+            <div class="modal-content relative">
+                <span class="close-button text-white">&times;</span>
+                <div id="video-player-container" class="relative" style="padding-top: 56.25%;">
+                    <!-- Video will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot Page -->
+    <div id="chatbot-page" class="page">
+        <div class="flex items-center justify-center min-h-screen p-4 bg-gray-100 text-gray-800">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl h-[90vh] md:h-[80vh] flex flex-col overflow-hidden">
+                
+                <!-- Chat Header -->
+                <div class="bg-[#0f766e] text-white p-6 rounded-t-3xl shadow-md flex justify-between items-center">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center">
+                        <h1 class="text-2xl font-semibold mr-2">ArogyaMitra</h1>
+                        <span class="text-xs text-gray-200 mt-1 sm:mt-0 font-light">Your Health Assistant</span>
+                    </div>
+                    <div class="relative">
+                        <select id="languageSelect" class="bg-white text-gray-800 px-4 py-2 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0d6660]">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Message Display Area -->
+                <div id="messages" class="flex-1 overflow-y-auto p-6 flex flex-col space-y-4 bg-[#f1f5f9] scroll-smooth">
+                    <!-- Typing indicator -->
+                    <div id="typingIndicator" class="typing-indicator self-start hidden">
+                        <div class="message-bubble bot-message self-start">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick reply buttons -->
+                <div id="quickReplies" class="flex justify-center p-4 border-t border-gray-200 bg-gray-50 gap-2 flex-wrap quick-replies-transition">
+                    <!-- Buttons will be populated by JavaScript -->
+                </div>
+
+                <!-- Input Area -->
+                <div class="p-4 border-t border-gray-200 bg-gray-50 flex items-center gap-4">
+                    <input type="text" id="userInput" class="flex-1 p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0f766e] placeholder-gray-500" placeholder="Ask ArogyaMitra about your health...">
+                    <button id="sendBtn" class="bg-[#0f766e] text-white rounded-xl p-3 px-6 font-semibold shadow-md hover:bg-[#0d6660] transition-colors">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Back button -->
+        <div class="fixed top-4 left-4">
+            <button onclick="showPage('home-page')" class="bg-teal-600 text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </button>
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login-page" class="page">
+        <div class="h-screen flex items-center justify-center bg-gradient-to-r from-teal-200 to-teal-600">
+            <div class="w-full max-w-sm sm:max-w-md bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-teal-600 text-center mb-6">Log In</h2>
+                <p class="text-center text-gray-600 mb-6">Welcome back to ArogyaMitra</p>
+                <form class="space-y-4">
+                    <input type="email" placeholder="Email" required
+                           class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <input type="password" placeholder="Password" required
+                           class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <button type="submit"
+                            class="w-full bg-teal-600 text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition">
+                        Sign In
+                    </button>
+                </form>
+                <p class="text-center text-sm text-gray-600 mt-6">
+                    Don't have an account?
+                    <a href="#" onclick="showPage('signup-page')" class="text-teal-600 font-medium hover:underline">Sign Up</a>
+                </p>
+                <p class="text-center mt-2">
+                    <a href="#" onclick="showPage('home-page')" class="text-gray-500 text-sm hover:underline">← Back to Home</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Page -->
+    <div id="signup-page" class="page">
+        <div class="h-screen flex items-center justify-center bg-gradient-to-r from-teal-200 to-teal-600">
+            <div class="w-full max-w-sm sm:max-w-md bg-gradient-to-br from-white to-gray-50 p-6 sm:p-8 rounded-xl shadow-lg">
+                <!-- Heading -->
+                <h2 class="text-2xl font-bold text-teal-600 text-center mb-2">Sign Up</h2>
+                <p class="text-center text-gray-600 mb-6">Create your ArogyaMitra account</p>
+
+                <form id="signupForm" class="space-y-4">
+                    <input type="text" id="signupName" placeholder="Full Name"
+                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <input type="email" id="signupEmail" placeholder="Email"
+                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <input type="password" id="signupPassword" placeholder="Password"
+                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <input type="password" id="signupConfirmPassword" placeholder="Confirm Password"
+                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+
+                    <button type="submit"
+                        class="w-full bg-teal-600 text-white p-3 rounded-lg font-semibold hover:bg-teal-700 transition">
+                        Sign Up
+                    </button>
+                </form>
+
+
+                <!-- Footer Links -->
+                <p class="text-center text-sm text-gray-600 mt-6">
+                    Already have an account?
+                    <a href="#" onclick="showPage('login-page')" class="text-teal-600 font-medium hover:underline">Log In</a>
+                </p>
+                <p class="text-center mt-2">
+                    <a href="#" onclick="showPage('home-page')" class="text-gray-500 text-sm hover:underline">← Back to Home</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <script>
+function showPage(pageId) {
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+
+    // Show the selected page
+    const page = document.getElementById(pageId);
+    if (page) {
+        page.classList.add('active');
+        window.scrollTo(0, 0);
+    }
+}
+
+// By default, make home-page active
+document.addEventListener("DOMContentLoaded", function() {
+    showPage('home-page');
+});
+</script>
+<script src="script.js"></script>
+
+</body>
+</html>
